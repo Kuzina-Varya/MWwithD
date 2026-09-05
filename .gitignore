@@ -24,22 +24,6 @@ dist/
 .env.*
 !.env.example
 
-# Data files
-data/raw/*
-data/processed/*
-data/external/*
-!data/raw/DESCRIPTION.txt
-!data/processed/DESCRIPTION.txt
-!data/external/DESCRIPTION.txt
-
-# Model artifacts
-models/*
-!models/DESCRIPTION.txt
-
-# Reports generated during analysis
-reports/*
-!reports/DESCRIPTION.txt
-
 # OS and editor files
 .DS_Store
 Thumbs.db
