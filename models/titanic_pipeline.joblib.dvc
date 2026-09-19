@@ -1,0 +1,5 @@
+outs:
+- md5: 017beb5f5467f015042080023dd737a4
+  size: 5082
+  hash: md5
+  path: titanic_pipeline.joblib

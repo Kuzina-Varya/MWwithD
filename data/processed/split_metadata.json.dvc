@@ -1,0 +1,5 @@
+outs:
+- md5: 98ddf9a3c28d91eaacbf8f5daa6367c4
+  size: 607
+  hash: md5
+  path: split_metadata.json
