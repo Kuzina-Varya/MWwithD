@@ -10,3 +10,4 @@ pathspec==0.12.1
 jupyterlab==4.2.5
 nbconvert==7.16.4
 ipykernel==6.29.5
+imbalanced-learn==0.12.4

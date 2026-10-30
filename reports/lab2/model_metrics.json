@@ -1,0 +1,14 @@
+{
+  "variant": 10,
+  "dataset": "Iris",
+  "best_imputer": "KNN",
+  "use_lof": false,
+  "best_selector": "RFE",
+  "best_params": {
+    "model__C": 1.0
+  },
+  "cv_roc_auc": 0.998958,
+  "test_accuracy": 0.966667,
+  "test_f1_macro": 0.966583,
+  "test_roc_auc_macro_ovr": 0.993333
+}

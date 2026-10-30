@@ -137,3 +137,50 @@ Notebook, метрики и изображения.
 
 Фактические метрики последнего выполнения находятся в
 `reports/model_metrics.json`, краткий вывод — в `reports/lab1_summary.md`.
+
+## Лабораторная работа №2
+
+Вторая лабораторная находится в отдельной ветке `lab-2-iris` и выполняется из
+Notebook:
+
+```text
+notebooks/lab2_iris_variant10.ipynb
+```
+
+Она сравнивает SimpleImputer, KNNImputer и IterativeImputer, исследует LOF
+только на тренировочных данных, создаёт полиномиальные признаки и сравнивает
+RFE с L1-отбором. Выбор каждого компонента выполняется по пятифолдовой
+кросс-валидации, а итоговая оценка — на отложенном test.
+
+### Файлы лабораторной №2
+
+```text
+data/
+├── raw/
+│   ├── iris_lab2.csv                 данные с 15% пропусков (локально)
+│   └── iris_lab2.csv.dvc             DVC-метаданные
+└── processed/lab2/
+    ├── train.csv                     train с учебными выбросами (локально)
+    ├── train.csv.dvc                 DVC-метаданные train
+    ├── test.csv                      неизменённый отложенный test (локально)
+    └── test.csv.dvc                  DVC-метаданные test
+
+models/
+├── iris_lab2_pipeline.pkl            полный переносимый Pipeline (локально)
+└── iris_lab2_pipeline.pkl.dvc        DVC-метаданные модели
+
+reports/lab2/
+├── figures/                          графики пропусков, LOF, ROC и ошибок
+├── imputation_comparison.csv         сравнение трёх импутеров
+├── lof_comparison.csv                сравнение с LOF и без LOF
+├── feature_selection_comparison.csv  сравнение без отбора, RFE и L1
+├── selected_features.csv             список полиномиальных признаков
+├── grid_search_results.csv           результаты GridSearchCV
+├── classification_report.csv         метрики по классам
+├── model_metrics.json                итоговые метрики и конфигурация
+└── lab2_summary.md                    полный аналитический отчёт
+```
+
+Для выполнения откройте `notebooks/lab2_iris_variant10.ipynb` и выберите
+**Restart Kernel and Run All Cells**. Notebook самостоятельно обновит данные,
+модель, сравнительные таблицы, изображения, DVC-файлы и аналитический отчёт.
