@@ -1,1 +1,12 @@
-# Зависимости проекта.
+numpy==1.26.4
+pandas==2.2.3
+scikit-learn==1.5.2
+matplotlib==3.9.2
+seaborn==0.13.2
+joblib==1.4.2
+cloudpickle==3.1.1
+dvc==3.56.0
+pathspec==0.12.1
+jupyterlab==4.2.5
+nbconvert==7.16.4
+ipykernel==6.29.5

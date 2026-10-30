@@ -1,0 +1,15 @@
+{
+  "variant": 10,
+  "dataset": "Iris",
+  "random_state": 42,
+  "train_rows": 120,
+  "test_rows": 30,
+  "best_cv_accuracy": 0.95,
+  "test_accuracy": 0.966667,
+  "test_f1_macro": 0.966583,
+  "test_roc_auc_macro_ovr": 0.996667,
+  "best_params": {
+    "model__C": 1.0,
+    "model__class_weight": null
+  }
+}

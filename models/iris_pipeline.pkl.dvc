@@ -1,0 +1,5 @@
+outs:
+- md5: 9ddf51f34f94168bc148511403f6a8b7
+  size: 7113
+  hash: md5
+  path: iris_pipeline.pkl
