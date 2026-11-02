@@ -8,23 +8,25 @@
   "automl_test_rows": 50000,
   "best_run": "deployment_optimized",
   "best_model": "WeightedEnsemble_L2",
+  "selection_metric": "minimum internal validation RMSE",
+  "best_validation_rmse": 20.899009526992877,
   "automl_metrics": {
-    "rmse": 21.431996884960476,
-    "mae": 17.022039288711323,
-    "r2": 0.9874100597646809
+    "rmse": 20.817061211318016,
+    "mae": 16.55053832936704,
+    "r2": 0.9881221665317103
   },
   "baseline_metrics": {
     "rmse": 50.21789807431683,
     "mae": 39.34348406936408,
     "r2": 0.930878133751599
   },
-  "rmse_improvement_percent": 57.32199533074137,
+  "rmse_improvement_percent": 58.54653020221772,
   "residual_statistics": {
-    "mean": -0.39962595851488414,
-    "std": 21.42827080214912,
-    "p05": -35.582456207275385,
-    "median": -0.4495391845703125,
-    "p95": 34.40722274780273
+    "mean": -0.2409444551576674,
+    "std": 20.81566677397796,
+    "p05": -34.43313064575195,
+    "median": -0.3208339214324951,
+    "p95": 33.856751251220636
   },
   "mlflow_experiment": "lab5_variant10_synthetic_regression",
   "versions": {
