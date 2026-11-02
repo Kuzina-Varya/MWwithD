@@ -281,3 +281,73 @@ reports/lab4/
 При первом запуске загружаются GloVe и `all-MiniLM-L6-v2`; затем они берутся из
 локального кэша. GPU используется автоматически при наличии. Текущий запуск
 выполнен на CPU, поскольку CUDA в окружении недоступна.
+
+## Лабораторная работа №5
+
+Пятая лабораторная выполнена для варианта 10 в ветке
+`lab-5-variant10`. Главный исполняемый файл:
+
+```text
+notebooks/lab5_synthetic_regression_variant10.ipynb
+```
+
+Notebook создаёт синтетический набор регрессии из 3 млн строк и 20 исходных
+признаков, обрабатывает его в PySpark, добавляет четыре признака, выполняет
+разбиение 80/20 в Spark и сравнивает два запуска AutoGluon. Параметры, метрики,
+leaderboard, версии библиотек и модели регистрируются в локальном MLflow.
+
+### Где хранятся файлы лабораторной №5
+
+```text
+data/
+├── raw/
+│   ├── lab5_synthetic_regression.parquet       3 млн исходных строк (локально)
+│   └── lab5_synthetic_regression.parquet.dvc   DVC-метаданные raw-данных
+└── processed/lab5/
+    ├── automl_train.parquet                     120 000 строк из Spark-train
+    ├── automl_train.parquet.dvc                 DVC-метаданные train
+    ├── automl_test.parquet                      50 000 строк из Spark-test
+    └── automl_test.parquet.dvc                  DVC-метаданные test
+
+models/
+├── lab5_autogluon/                              два AutoGluon predictor и baseline
+└── lab5_autogluon.dvc                           DVC-метаданные моделей
+
+reports/lab5/
+├── figures/
+│   ├── data_overview.png                        распределение цели и объёмы
+│   ├── model_analysis.png                       метрики, прогнозы, importance
+│   └── mlflow_ui.png                            снимок двух запусков MLflow UI
+├── automl_run_comparison.csv                    сравнение AutoML-запусков
+├── leaderboard_*.csv                            leaderboard каждого запуска
+├── test_metrics.csv                             AutoML против baseline на test
+├── feature_importance.csv                       permutation importance
+├── residual_statistics.csv                     статистика остатков
+├── spark_schema.csv                             итоговая схема Spark
+├── processed_sample_10.csv                      первые 10 обработанных строк
+├── split_summary.csv                            размеры полного split и выборок
+├── true_coefficients.csv                        коэффициенты генератора
+├── model_metrics.json                           машиночитаемые итоги
+└── lab5_summary.md                               аналитический отчёт
+
+mlruns/                                           локальное хранилище MLflow (не Git)
+```
+
+Большой raw-файл, подготовленные выборки и модели не добавляются напрямую в
+Git: их версии фиксируются `.dvc`-файлами. Каталог `mlruns/` создаётся локально
+при запуске и исключён из Git, а подтверждающий снимок UI хранится в отчёте.
+
+### Текущий результат
+
+После очистки осталось 2 999 000 уникальных строк: удалены 1 000 дубликатов и
+импутированы 6 000 пропусков. Лучшим стал `WeightedEnsemble_L2` из запуска
+`deployment_optimized`: RMSE `21.4320`, MAE `17.0220`, R² `0.9874` на 50 000
+строк отдельной Spark-test выборки. Его RMSE ниже RandomForest baseline на
+57.32%. Подробная интерпретация находится в `reports/lab5/lab5_summary.md`.
+
+Для повторного выполнения установите зависимости и запустите все ячейки
+Notebook. На Windows он автоматически использует короткие ASCII-пути для
+Spark, поэтому проект может находиться в каталоге с кириллицей. Полные части
+Spark train/test намеренно не выгружаются в pandas: AutoML использует
+воспроизводимые выборки, что соответствует примечанию преподавателя об
+ограничении памяти.

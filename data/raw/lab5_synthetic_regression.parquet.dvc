@@ -1,0 +1,5 @@
+outs:
+- md5: a3e70bbff5165f84ab9c8368c6e9307b
+  size: 271972454
+  hash: md5
+  path: lab5_synthetic_regression.parquet

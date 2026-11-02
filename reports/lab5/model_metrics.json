@@ -1,0 +1,39 @@
+{
+  "variant": 10,
+  "raw_rows": 3000000,
+  "processed_rows": 2999000,
+  "spark_train_rows": 2400273,
+  "spark_test_rows": 598727,
+  "automl_train_rows": 120000,
+  "automl_test_rows": 50000,
+  "best_run": "deployment_optimized",
+  "best_model": "WeightedEnsemble_L2",
+  "automl_metrics": {
+    "rmse": 21.431996884960476,
+    "mae": 17.022039288711323,
+    "r2": 0.9874100597646809
+  },
+  "baseline_metrics": {
+    "rmse": 50.21789807431683,
+    "mae": 39.34348406936408,
+    "r2": 0.930878133751599
+  },
+  "rmse_improvement_percent": 57.32199533074137,
+  "residual_statistics": {
+    "mean": -0.39962595851488414,
+    "std": 21.42827080214912,
+    "p05": -35.582456207275385,
+    "median": -0.4495391845703125,
+    "p95": 34.40722274780273
+  },
+  "mlflow_experiment": "lab5_variant10_synthetic_regression",
+  "versions": {
+    "python": "3.11.9",
+    "numpy": "1.26.4",
+    "pandas": "2.2.3",
+    "scikit_learn": "1.5.2",
+    "pyspark": "3.5.3",
+    "autogluon_tabular": "1.2",
+    "mlflow": "2.17.2"
+  }
+}

@@ -1,0 +1,3 @@
+part,rows,used_by_automl
+Spark train (full),2400273,120000
+Spark test (full),598727,50000

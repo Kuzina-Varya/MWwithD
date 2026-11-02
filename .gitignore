@@ -29,3 +29,6 @@ dist/
 Thumbs.db
 .vscode/
 .idea/
+
+# Local MLflow tracking store
+mlruns/
