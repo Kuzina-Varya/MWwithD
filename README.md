@@ -1,9 +1,12 @@
-# Лабораторная работа №1 — Iris, вариант 10
+# Продвинутые методы машинного обучения — лабораторные №1–5
 
-Воспроизводимое решение первой лабораторной работы «Введение и
-воспроизводимость исследований». Главный исполняемый документ — Jupyter
-Notebook: он загружает данные, создаёт пропуски, проводит анализ, обучает
-Pipeline, оценивает модель и раскладывает результаты по папкам проекта.
+В репозитории собраны полностью исполняемые решения лабораторных работ для
+варианта 10. Каждая работа запускается из отдельного Jupyter Notebook: он
+получает или создаёт данные, выполняет расчёты, сохраняет модели, изображения,
+таблицы и формирует аналитический отчёт. Большие данные и модели отслеживаются
+через DVC, а небольшие отчётные артефакты хранятся в Git.
+
+## Лабораторная работа №1 — Iris и воспроизводимый Pipeline
 
 ## Задание варианта
 
@@ -116,15 +119,17 @@ Notebook выполняет `dvc add` для исходных данных, trai
 показывает `dvc status`. DVC remote пока не настроен, поэтому для переноса
 данных на другой компьютер позднее потребуется внешнее хранилище.
 
-После проверки результатов:
+Изменения следует фиксировать в отдельной ветке после проверки результатов:
 
 ```powershell
-git add .
+git status --short
+git add <проверенные файлы лабораторной>
 git commit -m "Complete lab 1 for Iris variant 10"
 ```
 
-Коммит не создаётся автоматически, чтобы перед фиксацией можно было проверить
-Notebook, метрики и изображения.
+После push ветка объединяется с `main` через Pull Request. Notebook не создаёт
+коммиты автоматически, поэтому перед фиксацией можно проверить изменения и не
+добавить в историю посторонние файлы.
 
 ## Воспроизводимость
 
@@ -138,216 +143,209 @@ Notebook, метрики и изображения.
 Фактические метрики последнего выполнения находятся в
 `reports/model_metrics.json`, краткий вывод — в `reports/lab1_summary.md`.
 
-## Лабораторная работа №2
+## Лабораторная работа №2 — пропуски, выбросы и отбор признаков
 
-Вторая лабораторная находится в отдельной ветке `lab-2-iris` и выполняется из
-Notebook:
+Главный файл — `notebooks/lab2_iris_variant10.ipynb`. Для Iris воспроизводимо
+создаются 15% пропусков в трёх числовых колонках по механизму **MCAR**: позиции
+выбираются случайно и независимо от признаков и класса. Такой механизм нужен,
+чтобы сравнение импутеров не смешивалось с дополнительной зависимостью MAR.
+После стратифицированного split 80/20 четыре учебных выброса добавляются только
+в train; test остаётся неизменным до финальной оценки.
 
-```text
-notebooks/lab2_iris_variant10.ipynb
-```
+### Что делает Notebook №2
 
-Она сравнивает SimpleImputer, KNNImputer и IterativeImputer, исследует LOF
-только на тренировочных данных, создаёт полиномиальные признаки и сравнивает
-RFE с L1-отбором. Выбор каждого компонента выполняется по пятифолдовой
-кросс-валидации, а итоговая оценка — на отложенном test.
+1. Сравнивает `SimpleImputer`, `KNNImputer` и `IterativeImputer` на пяти фолдах.
+2. Визуализирует восстановленные распределения признаков.
+3. Сравнивает вариант без LOF и train-only `LOFTrainSampler`; test при поиске
+   выбросов не используется.
+4. Создаёт 14 признаков через `PolynomialFeatures`.
+5. Сравнивает отсутствие отбора, RFE и L1-отбор.
+6. Подбирает `C` логистической регрессии по CV, сохраняет Pipeline и один раз
+   оценивает его на test.
 
-### Файлы лабораторной №2
+По CV выбран KNNImputer (accuracy 0,9750), от LOF отказались, потому что он не
+улучшил ROC-AUC, а лучшим отбором стал RFE с 8 признаками и CV ROC-AUC 0,9990.
+На test получены accuracy 0,9667, F1-macro 0,9666 и ROC-AUC 0,9933: ошибочно
+классифицирован один объект из 30.
 
-```text
-data/
-├── raw/
-│   ├── iris_lab2.csv                 данные с 15% пропусков (локально)
-│   └── iris_lab2.csv.dvc             DVC-метаданные
-└── processed/lab2/
-    ├── train.csv                     train с учебными выбросами (локально)
-    ├── train.csv.dvc                 DVC-метаданные train
-    ├── test.csv                      неизменённый отложенный test (локально)
-    └── test.csv.dvc                  DVC-метаданные test
-
-models/
-├── iris_lab2_pipeline.pkl            полный переносимый Pipeline (локально)
-└── iris_lab2_pipeline.pkl.dvc        DVC-метаданные модели
-
-reports/lab2/
-├── figures/                          графики пропусков, LOF, ROC и ошибок
-├── imputation_comparison.csv         сравнение трёх импутеров
-├── lof_comparison.csv                сравнение с LOF и без LOF
-├── feature_selection_comparison.csv  сравнение без отбора, RFE и L1
-├── selected_features.csv             список полиномиальных признаков
-├── grid_search_results.csv           результаты GridSearchCV
-├── classification_report.csv         метрики по классам
-├── model_metrics.json                итоговые метрики и конфигурация
-└── lab2_summary.md                    полный аналитический отчёт
-```
-
-Для выполнения откройте `notebooks/lab2_iris_variant10.ipynb` и выберите
-**Restart Kernel and Run All Cells**. Notebook самостоятельно обновит данные,
-модель, сравнительные таблицы, изображения, DVC-файлы и аналитический отчёт.
-
-## Лабораторная работа №3
-
-Третья лабораторная находится в ветке `lab-3-iris`. Главный файл:
+### Где хранятся материалы №2
 
 ```text
-notebooks/lab3_iris_variant10.ipynb
+data/raw/iris_lab2.csv(.dvc)             Iris с MCAR-пропусками
+data/processed/lab2/train.csv(.dvc)      train с учебными выбросами
+data/processed/lab2/test.csv(.dvc)       неизменённый отложенный test
+models/iris_lab2_pipeline.pkl(.dvc)      полный переносимый Pipeline
+reports/lab2/figures/                    пропуски, LOF, ROC и матрица ошибок
+reports/lab2/imputation_comparison.csv   сравнение трёх импутеров
+reports/lab2/lof_comparison.csv          сравнение с LOF и без него
+reports/lab2/feature_selection_comparison.csv  сравнение RFE и L1
+reports/lab2/selected_features.csv       выбранные полиномиальные признаки
+reports/lab2/grid_search_results.csv     результаты GridSearchCV
+reports/lab2/model_metrics.json          машиночитаемые итоговые метрики
+reports/lab2/lab2_summary.md             аналитический отчёт
 ```
 
-Notebook сравнивает XGBoost, LightGBM и CatBoost, проводит 50 trials Optuna,
-строит SHAP-графики и сравнивает оптимизированный бустинг со стекингом из
-LightGBM, RandomForest и SVC. Test используется только для финальной оценки.
+Для воспроизведения выполните все ячейки Notebook №2. Он самостоятельно
+обновляет данные, модель, DVC-метаданные, таблицы, изображения и отчёт.
 
-### Файлы лабораторной №3
+## Лабораторная работа №3 — бустинги, Optuna, SHAP и стекинг
+
+Главный файл — `notebooks/lab3_iris_variant10.ipynb`. На одинаковой
+пятифолдовой CV сравниваются XGBoost, LightGBM и CatBoost. У baseline-моделей
+оставлены библиотечные гиперпараметры по умолчанию; явно заданы только seed,
+число потоков и режим вывода. Это отделяет честное исходное сравнение от
+последующей оптимизации.
+
+### Что делает Notebook №3
+
+1. Проверяет баланс трёх классов Iris и обосновывает отказ от SMOTE/весов.
+2. Сравнивает три библиотеки по ROC-AUC, F1-macro и времени обучения.
+3. Выполняет ровно 50 trials Optuna для лучшей библиотеки без доступа к test.
+4. Строит SHAP summary, bar, два dependence plot и три waterfall для разных
+   объектов, а не для одного примера.
+5. Сравнивает базовый и оптимизированный CatBoost со `StackingClassifier` из
+   LightGBM, RandomForest и SVC с `cv=5`.
+6. Обучает выбранную по CV модель на полном train и один раз оценивает test.
+
+Лучшим baseline стал CatBoost с CV ROC-AUC 0,9990. Лучший trial Optuna и
+оптимизированный CatBoost достигли CV ROC-AUC 1,0000. На test итоговая модель
+получила accuracy/F1-macro 0,9333 и ROC-AUC 0,9900; допущены две ошибки из 30.
+SHAP показывает наибольшую роль `petal_length` и `petal_width` для virginica.
+
+### Где хранятся материалы №3
 
 ```text
-data/
-├── raw/
-│   ├── iris_lab3.csv                  чистый Iris (локально)
-│   └── iris_lab3.csv.dvc              DVC-метаданные
-└── processed/lab3/
-    ├── train.csv                      тренировочная выборка (локально)
-    ├── train.csv.dvc                  DVC-метаданные train
-    ├── test.csv                       отложенная выборка (локально)
-    └── test.csv.dvc                   DVC-метаданные test
-
-models/
-├── iris_lab3_model.pkl                финальная модель (локально)
-└── iris_lab3_model.pkl.dvc            DVC-метаданные модели
-
-reports/lab3/
-├── figures/                            EDA, Optuna, SHAP, ROC и ошибки
-├── boosting_comparison.csv             сравнение трёх бустингов
-├── model_comparison.csv                бустинг против стекинга
-├── optuna_trials.csv                   результаты 50 trials
-├── optuna_param_importance.csv         важность гиперпараметров
-├── best_optuna_params.json             лучшие параметры
-├── shap_feature_importance.csv         глобальная SHAP-важность
-├── classification_report.csv           метрики по классам
-├── model_metrics.json                  итоговые метрики
-└── lab3_summary.md                      аналитический отчёт
+data/raw/iris_lab3.csv(.dvc)             исходный Iris
+data/processed/lab3/train.csv(.dvc)      тренировочная часть
+data/processed/lab3/test.csv(.dvc)       отложенный test
+models/iris_lab3_model.pkl(.dvc)         оптимизированный CatBoost
+reports/lab3/figures/                    EDA, Optuna, SHAP, ROC и ошибки
+reports/lab3/boosting_comparison.csv     сравнение XGB/LGBM/CatBoost
+reports/lab3/model_comparison.csv        baseline, optimized и stacking
+reports/lab3/optuna_trials.csv           все 50 trials
+reports/lab3/best_optuna_params.json     лучшие параметры
+reports/lab3/shap_feature_importance.csv глобальная SHAP-важность
+reports/lab3/model_metrics.json          итоговые метрики
+reports/lab3/lab3_summary.md             аналитический отчёт
 ```
 
-Для повторного выполнения откройте Notebook и выберите **Restart Kernel and
-Run All Cells**. Он самостоятельно пересоздаст данные, запустит сравнение,
-Optuna, SHAP, стекинг и обновит модель, DVC-файлы и отчёт.
+Полный повторный запуск Notebook №3 пересоздаёт все результаты. Optuna и SHAP
+занимают больше времени, чем лабораторные №1–2.
 
-## Лабораторная работа №4
+## Лабораторная работа №4 — представления текста ISEAR
 
-Четвёртая лабораторная находится в ветке `lab-4-isear`. Главный файл:
+Главный файл — `notebooks/lab4_isear_variant10.ipynb`. Используется
+`savalera/isear-from-original`, конфигурация `filtered`: 7 319 английских
+описаний семи эмоций и исходный split 5 853/732/734. Сравниваются требуемые
+три способа представления текста: TF-IDF, статический
+`fasttext-wiki-news-subwords-300` и Sentence-Transformer
+`all-MiniLM-L6-v2`. GloVe в итоговой реализации не используется.
+
+### Что делает Notebook №4
+
+1. Анализирует баланс классов и длины текстов.
+2. Для TF-IDF и FastText приводит текст к нижнему регистру, удаляет пунктуацию
+   и английские стоп-слова; контекстной модели передаёт минимально очищенный текст.
+3. Подбирает `C` логистической регрессии отдельно для каждого представления.
+4. Выбирает метод только по validation F1-macro и ROC-AUC.
+5. Переобучает кандидатов на train+validation и использует test только для
+   финального сравнения.
+6. Для лучшего представления строит PCA → t-SNE и PCA → UMAP.
+
+FastText даёт среднее покрытие словаря 0,973. Лучшим на validation стал
+Sentence-Transformers: F1-macro 0,6244 и ROC-AUC 0,9014. На test он получил
+accuracy 0,6008, F1-macro 0,6040 и ROC-AUC 0,8881. Частичное пересечение
+эмоций на t-SNE/UMAP ожидаемо: близкие эмоциональные ситуации используют
+похожую лексику и контекст.
+
+### Где хранятся материалы №4
 
 ```text
-notebooks/lab4_isear_variant10.ipynb
+data/raw/isear_lab4.csv(.dvc)                  очищенный ISEAR
+data/processed/lab4/{train,validation,test}.csv(.dvc)  исходный split
+models/isear_lab4_classifier.pkl(.dvc)         классификатор и метаданные
+reports/lab4/figures/dataset_overview.png      классы и длины текстов
+reports/lab4/figures/method_comparison.png     сравнение представлений
+reports/lab4/figures/confusion_matrix.png      матрица ошибок
+reports/lab4/figures/tsne_umap_embeddings.png  PCA → t-SNE/UMAP
+reports/lab4/*_validation.csv                  подбор каждого метода
+reports/lab4/method_comparison.csv             сравнение на validation
+reports/lab4/test_comparison.csv               финальные test-метрики
+reports/lab4/model_metrics.json                итоговая конфигурация
+reports/lab4/lab4_summary.md                   аналитический отчёт
 ```
 
-Вариант 10 решает задачу распознавания семи эмоций ISEAR. Сравниваются TF-IDF,
-предобученные статические GloVe-векторы из `gensim.downloader` и контекстные
-эмбеддинги `all-MiniLM-L6-v2`. Для лучшего представления выполняются PCA →
-t-SNE и PCA → UMAP. Источник данных:
-`savalera/isear-from-original`, конфигурация `filtered`.
+При первом запуске `gensim` загружает архив FastText размером около 1 ГБ, а
+Sentence-Transformers — `all-MiniLM-L6-v2`; затем используются локальные кэши.
+GPU выбирается автоматически, текущие результаты рассчитаны на CPU.
 
-### Файлы лабораторной №4
+## Лабораторная работа №5 — PySpark, AutoML и MLflow
+
+Главный файл — `notebooks/lab5_synthetic_regression_variant10.ipynb`. Notebook
+создаёт синтетическую регрессию из 3 млн строк и 20 признаков, очищает данные в
+PySpark, обучает два AutoGluon-запуска и регистрирует их в локальном MLflow.
+
+### Что делает Notebook №5
+
+1. Создаёт 2 999 000 уникальных наблюдений, 1 000 дубликатов и 6 000 пропусков.
+2. В Spark удаляет дубликаты, выполняет медианную импутацию, приводит поля к
+   `double` и добавляет сумму, среднее, L2-норму и взаимодействие признаков.
+3. До pandas выполняет Spark split 80/20. Из train берёт 120 000 строк для
+   AutoML, из test — 50 000 строк только для финальной оценки.
+4. Запускает `medium_quality` и `deployment_optimized` с лимитом 120 секунд.
+5. Сравнивает запуски только по внутреннему `score_val` AutoGluon. В
+   leaderboard отсутствуют test-метрики; test не влияет на выбор модели.
+6. После выбора один раз рассчитывает test RMSE/MAE/R², сравнивает результат с
+   RandomForest baseline, анализирует остатки и permutation importance.
+7. Сохраняет два запуска, параметры, validation-метрики, модели и версии в
+   MLflow; скриншот UI фильтруется по тегу корректной схемы выбора.
+
+По validation выбран `deployment_optimized` с `WeightedEnsemble_L2`: RMSE
+20,8990 против 20,9222 у второго запуска. На отдельном test получены RMSE
+20,8171, MAE 16,5505 и R² 0,9881. RandomForest baseline имеет RMSE 50,2179,
+поэтому AutoML уменьшил ошибку на 58,55%. Среднее и медиана остатков близки к
+нулю, то есть выраженного систематического смещения нет.
+
+### Где хранятся материалы №5
 
 ```text
-data/
-├── raw/
-│   ├── isear_lab4.csv                   полный очищенный ISEAR (локально)
-│   └── isear_lab4.csv.dvc               DVC-метаданные
-└── processed/lab4/
-    ├── train.csv                        тренировочная часть (локально)
-    ├── validation.csv                   часть для выбора метода (локально)
-    ├── test.csv                         финальная тестовая часть (локально)
-    └── *.csv.dvc                        DVC-метаданные разбиений
-
-models/
-├── isear_lab4_classifier.pkl            классификатор и метаданные (локально)
-└── isear_lab4_classifier.pkl.dvc        DVC-метаданные модели
-
-reports/lab4/
-├── figures/
-│   ├── dataset_overview.png             классы и длины текстов
-│   ├── method_comparison.png            сравнение трёх подходов
-│   ├── confusion_matrix.png             матрица ошибок
-│   └── tsne_umap_embeddings.png         PCA → t-SNE и PCA → UMAP
-├── tfidf_validation.csv                 подбор TF-IDF модели
-├── static_embeddings_validation.csv     статические эмбеддинги
-├── sentence_embeddings_validation.csv   Sentence-Transformers
-├── method_comparison.csv                сравнение на validation
-├── test_comparison.csv                  итоговые тестовые метрики
-├── classification_report.csv            метрики семи классов
-├── model_metrics.json                   итоговая конфигурация
-└── lab4_summary.md                       аналитический отчёт
+data/raw/lab5_synthetic_regression.parquet(.dvc)  3 млн исходных строк
+data/processed/lab5/automl_train.parquet(.dvc)    120 000 train-строк
+data/processed/lab5/automl_test.parquet(.dvc)     50 000 test-строк
+models/lab5_autogluon/                            два predictor и baseline
+models/lab5_autogluon.dvc                         DVC-метаданные моделей
+reports/lab5/figures/data_overview.png            цель и объёмы данных
+reports/lab5/figures/model_analysis.png           метрики, прогнозы, importance
+reports/lab5/figures/mlflow_ui.png                два отфильтрованных запуска
+reports/lab5/automl_run_comparison.csv            validation-сравнение запусков
+reports/lab5/leaderboard_*.csv                    leaderboard без test
+reports/lab5/test_metrics.csv                     финальный test и baseline
+reports/lab5/feature_importance.csv               permutation importance
+reports/lab5/residual_statistics.csv              статистика остатков
+reports/lab5/spark_schema.csv                     итоговая схема Spark
+reports/lab5/model_metrics.json                   машиночитаемые итоги
+reports/lab5/lab5_summary.md                      аналитический отчёт
+mlruns/                                           локальное хранилище, не в Git
 ```
 
-При первом запуске загружаются GloVe и `all-MiniLM-L6-v2`; затем они берутся из
-локального кэша. GPU используется автоматически при наличии. Текущий запуск
-выполнен на CPU, поскольку CUDA в окружении недоступна.
+На Windows Notebook автоматически применяет короткие ASCII-пути для Spark,
+поэтому репозиторий может находиться в каталоге с кириллицей. Полные Spark
+train/test не выгружаются в pandas, чтобы не создавать лишние копии данных и
+не превышать доступную память.
 
-## Лабораторная работа №5
+## Как запустить любую лабораторную
 
-Пятая лабораторная выполнена для варианта 10 в ветке
-`lab-5-variant10`. Главный исполняемый файл:
+После установки зависимостей откройте нужный файл в `notebooks/`, выберите
+ядро проекта и выполните **Restart Kernel and Run All Cells**. Для запуска без
+интерфейса замените имя файла в команде:
 
-```text
-notebooks/lab5_synthetic_regression_variant10.ipynb
+```powershell
+jupyter nbconvert --to notebook --execute --inplace `
+  notebooks\lab2_iris_variant10.ipynb `
+  --ExecutePreprocessor.timeout=-1
 ```
 
-Notebook создаёт синтетический набор регрессии из 3 млн строк и 20 исходных
-признаков, обрабатывает его в PySpark, добавляет четыре признака, выполняет
-разбиение 80/20 в Spark и сравнивает два запуска AutoGluon. Параметры, метрики,
-leaderboard, версии библиотек и модели регистрируются в локальном MLflow.
-
-### Где хранятся файлы лабораторной №5
-
-```text
-data/
-├── raw/
-│   ├── lab5_synthetic_regression.parquet       3 млн исходных строк (локально)
-│   └── lab5_synthetic_regression.parquet.dvc   DVC-метаданные raw-данных
-└── processed/lab5/
-    ├── automl_train.parquet                     120 000 строк из Spark-train
-    ├── automl_train.parquet.dvc                 DVC-метаданные train
-    ├── automl_test.parquet                      50 000 строк из Spark-test
-    └── automl_test.parquet.dvc                  DVC-метаданные test
-
-models/
-├── lab5_autogluon/                              два AutoGluon predictor и baseline
-└── lab5_autogluon.dvc                           DVC-метаданные моделей
-
-reports/lab5/
-├── figures/
-│   ├── data_overview.png                        распределение цели и объёмы
-│   ├── model_analysis.png                       метрики, прогнозы, importance
-│   └── mlflow_ui.png                            снимок двух запусков MLflow UI
-├── automl_run_comparison.csv                    сравнение AutoML-запусков
-├── leaderboard_*.csv                            leaderboard каждого запуска
-├── test_metrics.csv                             AutoML против baseline на test
-├── feature_importance.csv                       permutation importance
-├── residual_statistics.csv                     статистика остатков
-├── spark_schema.csv                             итоговая схема Spark
-├── processed_sample_10.csv                      первые 10 обработанных строк
-├── split_summary.csv                            размеры полного split и выборок
-├── true_coefficients.csv                        коэффициенты генератора
-├── model_metrics.json                           машиночитаемые итоги
-└── lab5_summary.md                               аналитический отчёт
-
-mlruns/                                           локальное хранилище MLflow (не Git)
-```
-
-Большой raw-файл, подготовленные выборки и модели не добавляются напрямую в
-Git: их версии фиксируются `.dvc`-файлами. Каталог `mlruns/` создаётся локально
-при запуске и исключён из Git, а подтверждающий снимок UI хранится в отчёте.
-
-### Текущий результат
-
-После очистки осталось 2 999 000 уникальных строк: удалены 1 000 дубликатов и
-импутированы 6 000 пропусков. Лучшим стал `WeightedEnsemble_L2` из запуска
-`deployment_optimized`: RMSE `21.4320`, MAE `17.0220`, R² `0.9874` на 50 000
-строк отдельной Spark-test выборки. Его RMSE ниже RandomForest baseline на
-57.32%. Подробная интерпретация находится в `reports/lab5/lab5_summary.md`.
-
-Для повторного выполнения установите зависимости и запустите все ячейки
-Notebook. На Windows он автоматически использует короткие ASCII-пути для
-Spark, поэтому проект может находиться в каталоге с кириллицей. Полные части
-Spark train/test намеренно не выгружаются в pandas: AutoML использует
-воспроизводимые выборки, что соответствует примечанию преподавателя об
-ограничении памяти.
+После выполнения проверьте `git status --short`, `dvc status`, созданный
+`reports/labN/labN_summary.md` и отсутствие ошибок в ячейках. В Git следует
+добавлять только проверенные метаданные DVC, Notebook и отчётные артефакты;
+локальные данные, модели, `.venv`, кэши и `mlruns` исключены правилами Git.
