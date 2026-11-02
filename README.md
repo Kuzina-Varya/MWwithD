@@ -184,3 +184,49 @@ reports/lab2/
 Для выполнения откройте `notebooks/lab2_iris_variant10.ipynb` и выберите
 **Restart Kernel and Run All Cells**. Notebook самостоятельно обновит данные,
 модель, сравнительные таблицы, изображения, DVC-файлы и аналитический отчёт.
+
+## Лабораторная работа №3
+
+Третья лабораторная находится в ветке `lab-3-iris`. Главный файл:
+
+```text
+notebooks/lab3_iris_variant10.ipynb
+```
+
+Notebook сравнивает XGBoost, LightGBM и CatBoost, проводит 50 trials Optuna,
+строит SHAP-графики и сравнивает оптимизированный бустинг со стекингом из
+LightGBM, RandomForest и SVC. Test используется только для финальной оценки.
+
+### Файлы лабораторной №3
+
+```text
+data/
+├── raw/
+│   ├── iris_lab3.csv                  чистый Iris (локально)
+│   └── iris_lab3.csv.dvc              DVC-метаданные
+└── processed/lab3/
+    ├── train.csv                      тренировочная выборка (локально)
+    ├── train.csv.dvc                  DVC-метаданные train
+    ├── test.csv                       отложенная выборка (локально)
+    └── test.csv.dvc                   DVC-метаданные test
+
+models/
+├── iris_lab3_model.pkl                финальная модель (локально)
+└── iris_lab3_model.pkl.dvc            DVC-метаданные модели
+
+reports/lab3/
+├── figures/                            EDA, Optuna, SHAP, ROC и ошибки
+├── boosting_comparison.csv             сравнение трёх бустингов
+├── model_comparison.csv                бустинг против стекинга
+├── optuna_trials.csv                   результаты 50 trials
+├── optuna_param_importance.csv         важность гиперпараметров
+├── best_optuna_params.json             лучшие параметры
+├── shap_feature_importance.csv         глобальная SHAP-важность
+├── classification_report.csv           метрики по классам
+├── model_metrics.json                  итоговые метрики
+└── lab3_summary.md                      аналитический отчёт
+```
+
+Для повторного выполнения откройте Notebook и выберите **Restart Kernel and
+Run All Cells**. Он самостоятельно пересоздаст данные, запустит сравнение,
+Optuna, SHAP, стекинг и обновит модель, DVC-файлы и отчёт.
