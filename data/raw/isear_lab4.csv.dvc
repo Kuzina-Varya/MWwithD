@@ -1,0 +1,5 @@
+outs:
+- md5: 6b34f48339840de1e1461f3d8fd6e75a
+  size: 919430
+  hash: md5
+  path: isear_lab4.csv

@@ -230,3 +230,54 @@ reports/lab3/
 Для повторного выполнения откройте Notebook и выберите **Restart Kernel and
 Run All Cells**. Он самостоятельно пересоздаст данные, запустит сравнение,
 Optuna, SHAP, стекинг и обновит модель, DVC-файлы и отчёт.
+
+## Лабораторная работа №4
+
+Четвёртая лабораторная находится в ветке `lab-4-isear`. Главный файл:
+
+```text
+notebooks/lab4_isear_variant10.ipynb
+```
+
+Вариант 10 решает задачу распознавания семи эмоций ISEAR. Сравниваются TF-IDF,
+предобученные статические GloVe-векторы из `gensim.downloader` и контекстные
+эмбеддинги `all-MiniLM-L6-v2`. Для лучшего представления выполняются PCA →
+t-SNE и PCA → UMAP. Источник данных:
+`savalera/isear-from-original`, конфигурация `filtered`.
+
+### Файлы лабораторной №4
+
+```text
+data/
+├── raw/
+│   ├── isear_lab4.csv                   полный очищенный ISEAR (локально)
+│   └── isear_lab4.csv.dvc               DVC-метаданные
+└── processed/lab4/
+    ├── train.csv                        тренировочная часть (локально)
+    ├── validation.csv                   часть для выбора метода (локально)
+    ├── test.csv                         финальная тестовая часть (локально)
+    └── *.csv.dvc                        DVC-метаданные разбиений
+
+models/
+├── isear_lab4_classifier.pkl            классификатор и метаданные (локально)
+└── isear_lab4_classifier.pkl.dvc        DVC-метаданные модели
+
+reports/lab4/
+├── figures/
+│   ├── dataset_overview.png             классы и длины текстов
+│   ├── method_comparison.png            сравнение трёх подходов
+│   ├── confusion_matrix.png             матрица ошибок
+│   └── tsne_umap_embeddings.png         PCA → t-SNE и PCA → UMAP
+├── tfidf_validation.csv                 подбор TF-IDF модели
+├── static_embeddings_validation.csv     статические эмбеддинги
+├── sentence_embeddings_validation.csv   Sentence-Transformers
+├── method_comparison.csv                сравнение на validation
+├── test_comparison.csv                  итоговые тестовые метрики
+├── classification_report.csv            метрики семи классов
+├── model_metrics.json                   итоговая конфигурация
+└── lab4_summary.md                       аналитический отчёт
+```
+
+При первом запуске загружаются GloVe и `all-MiniLM-L6-v2`; затем они берутся из
+локального кэша. GPU используется автоматически при наличии. Текущий запуск
+выполнен на CPU, поскольку CUDA в окружении недоступна.
