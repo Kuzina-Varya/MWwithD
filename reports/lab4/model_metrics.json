@@ -1,0 +1,22 @@
+{
+  "variant": 10,
+  "dataset": "ISEAR filtered",
+  "classes": [
+    "anger",
+    "disgust",
+    "fear",
+    "guilt",
+    "joy",
+    "sadness",
+    "shame"
+  ],
+  "device": "cpu",
+  "train_rows": 5853,
+  "validation_rows": 732,
+  "test_rows": 734,
+  "selected_method": "Sentence-Transformers",
+  "test_accuracy": 0.600817,
+  "test_f1_macro": 0.604025,
+  "test_roc_auc_macro_ovr": 0.888096,
+  "pca_explained_variance_50": 0.621361
+}

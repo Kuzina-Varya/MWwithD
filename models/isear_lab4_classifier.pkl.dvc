@@ -1,0 +1,5 @@
+outs:
+- md5: d2e88ba5f344c42841be9c4124ac9f78
+  size: 22814
+  hash: md5
+  path: isear_lab4_classifier.pkl
