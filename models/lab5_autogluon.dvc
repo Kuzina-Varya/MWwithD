@@ -1,0 +1,6 @@
+outs:
+- md5: 5b07a67a136cbe2a18d0601315062dae.dir
+  size: 403224985
+  nfiles: 32
+  hash: md5
+  path: lab5_autogluon

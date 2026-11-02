@@ -1,0 +1,5 @@
+outs:
+- md5: 345044554ff9dcd9470c7f4650a0f7ff
+  size: 9140590
+  hash: md5
+  path: automl_test.parquet
